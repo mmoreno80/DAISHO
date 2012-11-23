@@ -1,4 +1,17 @@
-DAISHO
-======
+Welcome to DAISHO GNU/Linux
 
-DAISHO
+DAISHO GNU/Linux is a lightweigth distribution, oriented to a basic
+environment to do some fun. It doesn't pretend to be user friendly,
+neither to be a complete distribution. The main idea behind this
+proyect, is to implement a GNU/Linux distribution closed to the *BSD
+flavours and to follow the KISS principle.
+
+At this point, it has a simple package management software which
+handles basic package's construction, installation, and removal (and
+others). They don't provide with dependences track, but help to
+construct and mantain they system.
+
+If you want to help or ask anything, drop me an email to mmoreno80 at
+gmail dot com. I'm going to be glad to reply you back.
+
+Have fun!
