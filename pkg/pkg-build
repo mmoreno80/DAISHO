@@ -1,0 +1,154 @@
+#!/bin/bash
+# -*- sh -*-
+#
+# pkg-build: Script to build packages.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PROGRAM=$(basename $0)
+
+usage ()
+{
+    STATUS=$1
+    echo "Usage: $PROGRAM [OPTION]... SCRIPT..."
+    echo "   or: $PROGRAM [OPTION]... --batch FILE"
+    if [ $STATUS -eq 0 ]
+    then
+	cat <<EOF
+
+$PROGRAM builds a package using the procedures in SCRIPT. A SCRIPT
+file must contain a build function and should end with build
+extension.
+	
+  --batch FILE    Read build scripts in FILE, one by line.
+  --clean         Delete temporal directories.
+  --force         Ignore errors.
+  --package       Make the package, without building.
+  -h, --help      Show this help.
+
+Copyright (c) 2012, Matias Moreno Meringer <mmoreno80@gmail.com>
+All rights reserved.
+EOF
+    fi
+    exit $STATUS
+}
+
+error ()
+{
+    echo "error:" $* 1>&2
+}
+
+warn ()
+{
+    echo "warning:" $* 1>&2
+}
+
+die ()
+{
+    error "$@"
+    exit 1
+}
+
+build_package ()
+{
+    set -e
+    umask 022
+    if [ "${OPTION_PACKAGE:-n}" = "n" ]
+    then
+	env \
+	    CWD="$CWD" \
+	    SCRIPT="$SCRIPT" \
+	    PACKAGE="$PACKAGE" \
+	    TARBALL="$TARBALL" \
+	    DATE="$DATE" \
+	    repodir="$repodir" \
+	    pkgdir="$pkgdir" \
+	    srcdir="$srcdir" \
+	    tmpdir="$tmpdir" \
+	    fakeroot -- bash -x -c "set -e;source $SCRIPT;build"
+    fi
+    echo "+ Packaging..."
+    fakeroot -- tar -C "$pkgdir" --transform 's,^\./,,' -cJf "$TARBALL" .
+    set +e
+}
+
+clean_directories ()
+{
+    [ "${OPTION_CLEAN:-n}" = "y" ] && rm -rf "$pkgdir" "$tmpdir" "$srcdir"
+}
+
+prebuild_checks ()
+{
+    [ "${OPTION_CLEAN:-n}" = "y" ] && rm -rf "$pkgdir" "$tmpdir" "$srcdir"
+    [ -e "$SCRIPT" ] || die "$SCRIPT not found"
+    [ -e "$TARBALL" -a "${OPTION_FORCE:-n}" = n ] && die "$TARBALL already exists"
+    [ -e "$srcdir" -a "${OPTION_FORCE:-n}" = n ] && die "$srcdir already exists"
+    [ -e "$pkgdir" -a "${OPTION_FORCE:-n}" = n ] && die "$pkgdir already exists"
+    [ -e "$tmpdir" -a "${OPTION_FORCE:-n}" = n ] && die "$tmpdir already exists"
+}
+
+TEMP=$(getopt -o h -l help,force,clean,package,batch: -n "$PROGRAM" -- "$@")
+[ $? -eq 0 ] || exit $?
+eval set -- $TEMP
+while :
+do
+    case "$1" in
+	-h|--help) usage 0;;
+	--batch) OPTION_BATCH="$2"; shift 2;;
+	--force) OPTION_FORCE="y"; shift 1;;
+	--clean) OPTION_CLEAN="y"; shift 1;;
+	--package) OPTION_PACKAGE="y"; shift 1;;
+	--) shift; break;;
+	*) usage 1;;
+    esac
+done
+
+[ -z "$@" ] && usage 1
+
+shopt -u sourcepath
+
+if [ ! -z "${OPTION_BATCH}" ]
+then
+    FILES=$(cat "$OPTION_BATCH")
+    [ $# -eq 0 ] || usage 1
+else
+    FILES="$@"
+fi
+
+for arg in "$FILES"
+do
+    if [ ! -e "$arg" ]
+    then
+	warn "Skipping $arg: file not found"
+    else
+	CWD=$(pwd)
+	SCRIPT=$(realpath "$arg")
+	PACKAGE=$(basename "$SCRIPT" .build)
+	TARBALL=$(basename "$PACKAGE")-$(date +%Y%m%d).txz
+	repodir=/usr/src
+	pkgdir=$CWD/$PACKAGE-build
+	srcdir=$CWD/$PACKAGE-source
+	tmpdir=$CWD/$PACKAGE-tmp
+	echo "+ Building package $PACKAGE"
+	echo "+ Target $TARBALL"
+	prebuild_checks
+	echo "+ Building ..."
+	build_package
+	echo "+ Cleaning ..."
+	clean_directories
+	echo "+ $TARBALL"
+    fi
+done

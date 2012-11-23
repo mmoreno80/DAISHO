@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# pkg-content: List package's content.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PROGRAM=$(basename $0)
+
+usage ()
+{
+    STATUS=$1
+    echo "Usage: $PROGRAM [OPTIONS] PACKAGE..."
+    if [ $STATUS -eq 0 ]
+    then
+	echo
+	echo "$PROGRAM shows PACKAGE contents."
+	echo
+	echo "		-v|--verbose	Verbose mode."
+	echo "		-h, --help      Show this help."
+	echo
+	echo "Copyright (c) 2012, Matias Moreno Meringer <mmoreno80@gmail.com>"
+	echo "All rights reserved."
+    fi
+    exit $STATUS
+}
+
+error ()
+{
+    echo "error:" $* 1>&2
+}
+
+warn ()
+{
+    echo "warning:" $* 1>&2
+}
+
+die ()
+{
+    error "$@"
+    exit 1
+}
+
+TEMP=$(getopt -o hv -l help,verbose -n "$PROGRAM" -- "$@")
+[ $? -eq 0 ] || exit $?
+eval set -- $TEMP
+while :
+do
+    case "$1" in
+	-h|--help) usage 0;;
+	-v|--verbose) OPTION_VERBOSE="v"; shift;;
+	--) shift; break;;
+	*) usage 1;;
+    esac
+done
+
+for arg in "$@"
+do
+    if [ -e "$arg" ]
+    then
+	tar t${OPTION_VERBOSE}f "$arg" | sed "s,^,$arg\t,"
+    else
+	warn "$arg not found"
+    fi
+done

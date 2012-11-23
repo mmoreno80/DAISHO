@@ -1,0 +1,102 @@
+#!/bin/bash
+# -*- sh -*-
+#
+# pkg-files: List files for a installed package.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+PROGRAM=$(basename $0)
+
+usage ()
+{
+    STATUS=$1
+    echo "Usage: $PROGRAM [OPTIONS] [PACKAGE...]"
+    if [ $STATUS -eq 0 ]
+    then
+	echo
+	echo "Shows files contained by each PACKAGE. If not PACKAGE provided,"
+	echo "shows files for each installed packages."
+	echo
+	echo "		--root DIR	Installation root directory."
+	echo "		--lib DIR	Installation libraries directory."
+	echo "		-h,--help	Show this help."
+	echo
+	echo "Copyright (c) 2012, Matias Moreno Meringer <mmoreno80@gmail.com>"
+	echo "All rights reserved."
+    fi
+    exit $STATUS
+}
+
+error ()
+{
+    echo "error:" $* 1>&2
+}
+
+warn ()
+{
+    echo "warning:" $* 1>&2
+}
+
+die ()
+{
+    error "$@"
+    exit 1
+}
+
+TEMP=$(getopt -o h -l help,root:,lib: -n "$PROGRAM" -- "$@")
+[ $? -eq 0 ] || exit $?
+eval set -- $TEMP
+while :
+do
+    case "$1" in
+	-h|--help) usage 0;;
+	--root) ROOT="$2"; shift 2;;
+	--lib) LIB="$2"; shift 2;;
+	--) shift; break;;
+	*) usage 1;;
+    esac
+done
+
+ROOT=${ROOT:-/}
+ROOT=$(realpath $ROOT)
+LIB=${LIB:-$ROOT/var/lib/pkg}
+LIB=$(realpath $LIB)
+
+[ -d "$ROOT" ] || die "cannot find root directory $ROOT"
+[ -d "$LIB" ] || die "cannot find lib directory $LIB"
+
+if [ -z "$@" ]
+then
+    FILES=$LIB/*.installed
+else
+    for arg in "$@"
+    do
+	if [ -e "$LIB/$arg.installed" ]
+	then
+	    FILES="$FILES $LIB/$arg.installed"
+	else
+	    warn "Cannot find $LIB/$arg.installed"
+	fi
+    done
+fi
+
+[ -z "$FILES" ] && die "cannot load installation files"
+
+for arg in $FILES
+do
+    PACKAGE=$(basename $arg .installed)
+    cat "$arg" | sed "s,^,$PACKAGE\t,"
+done
