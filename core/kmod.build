@@ -1,0 +1,40 @@
+# -*- sh -*-
+#
+# kmod.build: Builds kmod package.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+build ()
+{
+    tar xf $repodir/kmod-9.tar.xz
+    mv kmod-9 $srcdir
+    cd $srcdir
+    patch -Np1 -i $repodir/kmod-9-testsuite-1.patch
+    ./configure \
+    	--prefix=/usr       \
+        --bindir=/bin       \
+        --libdir=/lib       \
+        --sysconfdir=/etc   \
+        --with-xz           \
+        --with-zlib
+    make
+    make DESTDIR=$pkgdir pkgconfigdir=/usr/lib/pkgconfig install
+    mkdir -p $pkgdir/sbin
+    for target in depmod insmod modinfo modprobe rmmod; do
+	ln -sv /bin/kmod $pkgdir/sbin/$target
+    done
+    ln -sv kmod $pkgdir/bin/lsmod
+}

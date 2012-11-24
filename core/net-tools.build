@@ -1,0 +1,30 @@
+# -*- sh -*-
+#
+# net-tools.build: Builds net-tools package.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+build ()
+{
+    tar xf $repodir/net-tools-1.60.20120804git.tar.xz
+    mv net-tools-1.60.20120804git $srcdir
+    cd $srcdir
+    sed -i -e 's/HAVE_HWTR y/HAVE_HWTR n/' config.in
+    yes '' | make
+    make BASEDIR=$pkgdir update
+    rm $pkgdir/bin/{hostname,dnsdomainname,domainname}
+    rm -rf $pkgdir/usr/share/man/man1
+}

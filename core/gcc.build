@@ -1,0 +1,47 @@
+# -*- sh -*-
+#
+# gcc.build: Builds gcc package.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+build ()
+{
+    tar xf $repodir/gcc-4.7.1.tar.bz2
+    mv gcc-4.7.1 $srcdir
+    cd $srcdir
+    sed -i 's/install_to_$(INSTALL_DEST) //' libiberty/Makefile.in
+    sed -i 's/^T_CFLAGS =$/& -fomit-frame-pointer/' gcc/Makefile.in
+    sed -i -e /autogen/d -e /check.sh/d fixincludes/Makefile.in
+    cd $tmpdir
+    $srcdir/configure    \
+    	--prefix=/usr            \
+        --libexecdir=/usr/lib    \
+        --enable-shared          \
+        --enable-threads=posix   \
+        --enable-__cxa_atexit    \
+        --enable-clocale=gnu     \
+        --enable-languages=c,c++ \
+        --disable-multilib       \
+        --disable-bootstrap      \
+        --with-system-zlib
+    make
+    make DESTDIR=$pkgdir install
+    mkdir $pkgdir/lib
+    ln -sv /usr/bin/cpp $pkgdir/lib
+    ln -sv gcc $pkgdir/usr/bin/cc
+    mkdir -pv $pkgdir/usr/share/gdb/auto-load/usr/lib
+    mv -v $pkgdir/usr/lib/*gdb.py $pkgdir/usr/share/gdb/auto-load/usr/lib
+}

@@ -1,0 +1,30 @@
+# -*- sh -*-
+#
+# procps.build: Builds procps package.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+build ()
+{
+    tar xf $repodir/procps-3.2.8.tar.gz
+    mv procps-3.2.8 $srcdir
+    cd $srcdir
+    patch -Np1 -i $repodir/procps-3.2.8-fix_HZ_errors-1.patch
+    patch -Np1 -i $repodir/procps-3.2.8-watch_unicode-1.patch
+    sed -i -e 's@\*/module.mk@proc/module.mk ps/module.mk@' Makefile
+    make
+    make DESTDIR=$pkgdir ldconfig=echo install
+}

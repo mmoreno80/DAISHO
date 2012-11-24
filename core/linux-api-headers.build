@@ -1,0 +1,29 @@
+# -*- sh -*-
+#
+# linux-api-headers.build: Builds linux-api-headers package.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+build ()
+{
+    tar xf $repodir/linux-3.5.2.tar.xz
+    mv linux-3.5.2 $srcdir
+    cd $srcdir
+    mkdir $pkgdir/usr
+    make headers_check
+    make INSTALL_HDR_PATH=$pkgdir/usr headers_install
+    find $pkgdir \( -name .install -o -name ..install.cmd \) -delete
+}

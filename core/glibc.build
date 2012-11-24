@@ -1,0 +1,43 @@
+# -*- sh -*-
+#
+# glibc.build: Builds glibc package.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+build ()
+{
+    tar xf $repodir/glibc-2.16.0.tar.xz
+    mv glibc-2.16.0 $srcdir
+    cd $srcdir
+    sed -i 's#<rpc/types.h>#"rpc/types.h"#' sunrpc/rpc_clntout.c
+    sed -i '/test-installation.pl/d' Makefile
+    sed -i 's|@BASH@|/bin/bash|' elf/ldd.bash.in
+    patch -Np1 -i /usr/src/core/glibc-2.16.0-res_query_fix-1.patch
+    cd $tmpdir
+    CFLAGS=${CFLAGS/-fstack-proterctor/}
+    CFLAGS=${CFLAGS/-D_FORTIFY_SOURCE=2/}
+    $srcdir/configure \
+    	--prefix=/usr \
+    	--disable-profile \
+    	--enable-add-ons \
+    	--enable-kernel=2.6.25 \
+    	--libexecdir=/usr/lib/glibc
+    make
+    make DESTDIR=$pkgdir install
+    cp -v $CWD/glibc-source/sunrpc/rpc/*.h $pkgdir/usr/include/rpc
+    cp -v $CWD/glibc-source/sunrpc/rpcsvc/*.h $pkgdir/usr/include/rpcsvc
+    cp -v $CWD/glibc-source/nis/rpcsvc/*.h $pkgdir/usr/include/rpcsvc
+}

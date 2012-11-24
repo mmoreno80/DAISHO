@@ -1,0 +1,33 @@
+# -*- sh -*-
+#
+# binutils.build: Builds binutils package.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+build ()
+{
+    tar xf $repodir/binutils-2.22.tar.bz2
+    mv binutils-2.22 $srcdir
+    cd $srcdir
+    rm -fv etc/standards.info
+    sed -i.bak '/^INFO/s/standards.info //' etc/Makefile.in
+    patch -Np1 -i $repodir/binutils-2.22-build_fix-1.patch
+    cd $tmpdir
+    $srcdir/configure -prefix=/usr --enable-shared
+    make tooldir=/usr
+    make DESTDIR=$pkgdir tooldir=/usr install
+    cp -v $CWD/binutils-source/include/libiberty.h $pkgdir/usr/include
+}

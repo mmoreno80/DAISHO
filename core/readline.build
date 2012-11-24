@@ -1,0 +1,38 @@
+# -*- sh -*-
+#
+# readline.build: Builds readline package.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+build ()
+{
+    tar xf $repodir/readline-6.2.tar.gz
+    mv readline-6.2 $srcdir
+    cd $srcdir
+    sed -i '/MV.*old/d' Makefile.in
+    sed -i '/{OLDSUFF}/c:' support/shlib-install
+    patch -Np1 -i $repodir/readline-6.2-fixes-1.patch
+    ./configure \
+	--prefix=/usr \
+	--libdir=/lib
+    make SHLIB_LIBS=-lncurses
+    make DESTDIR=$pkgdir install
+    mkdir -p $pkgdir/usr/lib
+    mv -v $pkgdir/lib/lib{readline,history}.a $pkgdir/usr/lib
+    rm -v $pkgdir/lib/lib{readline,history}.so
+    ln -sfv /lib/libreadline.so.6 $pkgdir/usr/lib/libreadline.so
+    ln -sfv /lib/libhistory.so.6 $pkgdir/usr/lib/libhistory.so
+}

@@ -1,0 +1,48 @@
+# -*- sh -*-
+#
+# ncurses.build: Builds ncurses package.
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+build ()
+{
+    tar xf $repodir/ncurses-5.9.tar.gz
+    mv ncurses-5.9 $srcdir
+    cd $srcdir
+    ./configure \
+	--prefix=/usr \
+	--mandir=/usr/share/man \
+	--with-shared \
+        --without-debug \
+	--enable-widec
+    make
+    make DESTDIR=$pkgdir install
+    mkdir -p $pkgdir/lib
+    mv -v $pkgdir/usr/lib/libncursesw.so.5* $pkgdir/lib
+    ln -sfv /lib/libncursesw.so.5 $pkgdir/usr/lib/libncursesw.so
+    for l in ncurses form panel menu
+    do
+	rm -vf $pkgdir/usr/lib/lib$l.so
+	echo "INPUT(-l${l}w)" > $pkgdir/usr/lib/lib$l.so
+	ln -sfv lib${l}w.a $pkgdir/usr/lib/lib$l.a
+    done
+    ln -sfv libncurses++w.a $pkgdir/usr/lib/libncurses++.a
+    rm -vf $pkgdir/usr/lib/libcursesw.so
+    echo "INPUT(-lncursesw)" > $pkgdir/usr/lib/libcursesw.so
+    ln -sfv libncurses.so $pkgdir/usr/lib/libcurses.so
+    ln -sfv libncursesw.a $pkgdir/usr/lib/libcursesw.a
+    ln -sfv libncurses.a $pkgdir/usr/lib/libcurses.a
+}
