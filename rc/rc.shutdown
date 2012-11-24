@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# rc.shutdown: Script to shutdown the server (init 0).
+#
+# Copyright (C) 2012 Matias Moreno Meringer <mmoreno80@gmail.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+echo "Sending all processes the TERM signal..."
+/sbin/killall5 -15
+/bin/sleep 5
+
+echo "Sending all processes the KILL signal..."
+/sbin/killall5 -9
+
+echo "Deactivating swap partitions..."
+/sbin/swapoff -a
+
+echo "Saving random seed to a temporary file..."
+/bin/dd if=/dev/urandom of=/etc/random-seed count=1 bs=512 2>/dev/null
+
+echo "Saving the system time to hardware clock..."
+/sbin/hwclock --systohc --utc
+
+echo "Unmounting remote filesystems..."
+/bin/umount -a -f -tnfs
+
+echo "Writing wtmp..."
+/sbin/halt -w
+
+echo "Remounting root filesystem read-only..."
+/bin/mount -n -o remount,ro /
+
+echo "Flushing filesystem buffers..."
+/bin/sync
+
+echo "Unmounting local filesystems..."
+/bin/umount -a -r -tnonfs
+
+echo "Bye..."
+/sbin/halt -d -f -p
