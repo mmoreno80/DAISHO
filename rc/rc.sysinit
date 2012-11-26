@@ -17,15 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-echo "Mounting root device read-only..."
+echo "Mounting root device read-only"
 /bin/mount -n -o remount,ro /
 
-echo "Initializing swap partitions..."
+echo "Initializing swap partitions"
 /sbin/swapon -a
 
-echo "Filesystems check..."
+echo "Filesystems checks"
 /sbin/fsck -T -A -a -C
-if [ $? -gt 1 ]; then
+if [ $? -gt 1 ]
+then
    echo
    echo "ERROR:"
    echo "Your filesystem has been severely damaged. You can probably correct this"
@@ -39,48 +40,51 @@ if [ $? -gt 1 ]; then
    /sbin/reboot -f
 fi
 
-echo "Remounting root device read-write..."
+echo "Remounting root device read-write"
 /bin/mount -n -o remount,rw /
-echo >/etc/mtab
+> /etc/mtab
 /bin/mount -f -o remount,rw /
 
-echo "Mounting virtual filesystems..."
+echo "Mounting virtual filesystems"
 mkdir -p /dev/pts /dev/shm
 /bin/mount -a -tnonfs
 
-echo "Starting udev..."
+if [ -f "/etc/hostname" ]
+then
+    echo "Setting up hostname"
+    /bin/hostname -F /etc/hostname
+fi
+
+echo "Starting system and kernel log daemon"
+/sbin/syslogd -f /etc/syslog.conf
+
+echo "Starting udev"
 /lib/udev/udevd --daemon
 /sbin/udevadm trigger
 /sbin/udevadm settle
 
-echo "Setting up hostname..."
-/bin/hostname -F /etc/hostname
+echo "Setting system time from hardware clock"
+/sbin/hwclock --hctosys --utc
 
-if [ -f "/etc/random-seed" ]; then
-  echo "Initializing random number generator..."
-  /bin/cat /etc/random-seed >/dev/urandom
-  rm -f /etc/random-seed
+if [ -f "/etc/random-seed" ]
+then
+    echo "Initializing random number generator"
+    /bin/cat /etc/random-seed >/dev/urandom
+    rm -f /etc/random-seed
 fi
 
-echo "Writing utmp..."
+echo "Writing utmp"
 > /var/run/utmp
 /bin/chmod 664 /var/run/utmp
 /bin/chgrp utmp /var/run/utmp
 
-echo "Removing stale PID files..."
+echo "Removing stale PID files"
 /bin/rm -f /var/run/*.pid
 
-echo "Creating lock directory..."
+echo "Creating lock directory"
 /bin/mkdir /run/lock
 
-echo "Loading keymap..."
-/bin/loadkeys la-latin1
-
-echo "Setting system time from hardware clock..."
-/sbin/hwclock --hctosys --utc
-
-echo "Starting system and kernel log daemons..."
-/sbin/syslogd -f /etc/syslog.conf
-
-echo "Updating module dependencies..."
+echo "Updating modules dependencies"
 /sbin/depmod -a
+
+date
