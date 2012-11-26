@@ -15,10 +15,13 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-build ()
-{
+SOURCES=(http://pet.inf.ufsc.br/mirrors/archlinux/other/net-tools/net-tools-1.60.20120804git.tar.xz)
+VERSION=1.60
+BUILD=1
+
+build () {
     tar xf $repodir/net-tools-1.60.20120804git.tar.xz
     mv net-tools-1.60.20120804git $srcdir
     cd $srcdir

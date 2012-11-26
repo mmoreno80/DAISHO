@@ -1,5 +1,4 @@
 #!/bin/bash
-# -*- sh -*-
 #
 # pkg-build: Script to build packages.
 #
@@ -16,7 +15,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 PROGRAM=$(basename $0)
 
@@ -37,6 +36,7 @@ extension.
   --clean         Delete temporal directories.
   --force         Ignore errors.
   --package       Make the package, without building.
+  --repodir DIR	  Location of source files.
   -h, --help      Show this help.
 
 Copyright (c) 2012, Matias Moreno Meringer <mmoreno80@gmail.com>
@@ -68,6 +68,7 @@ build_package ()
     umask 022
     if [ "${OPTION_PACKAGE:-n}" = "n" ]
     then
+	echo "+ Building ..."
 	env \
 	    CWD="$CWD" \
 	    SCRIPT="$SCRIPT" \
@@ -87,20 +88,50 @@ build_package ()
 
 clean_directories ()
 {
-    [ "${OPTION_CLEAN:-n}" = "y" ] && rm -rf "$pkgdir" "$tmpdir" "$srcdir"
+    if [ "${OPTION_CLEAN:-n}" = "y" ]
+    then
+	echo "+ Cleaning ..."
+	rm -rf "$pkgdir" "$tmpdir" "$srcdir"
+    fi
 }
 
 prebuild_checks ()
 {
-    [ "${OPTION_CLEAN:-n}" = "y" ] && rm -rf "$pkgdir" "$tmpdir" "$srcdir"
-    [ -e "$SCRIPT" ] || die "$SCRIPT not found"
+    [ "${OPTION_CLEAN:-n}" = "y" ] && clean_directories
     [ -e "$TARBALL" -a "${OPTION_FORCE:-n}" = n ] && die "$TARBALL already exists"
     [ -e "$srcdir" -a "${OPTION_FORCE:-n}" = n ] && die "$srcdir already exists"
     [ -e "$pkgdir" -a "${OPTION_FORCE:-n}" = n ] && die "$pkgdir already exists"
     [ -e "$tmpdir" -a "${OPTION_FORCE:-n}" = n ] && die "$tmpdir already exists"
+    mkdir -p $tmpdir $pkgdir
 }
 
-TEMP=$(getopt -o h -l help,force,clean,package,batch: -n "$PROGRAM" -- "$@")
+environment ()
+{
+    CWD=$(pwd)
+    SCRIPT=$(realpath "$arg")
+    source $SCRIPT || die "sourcing $SCRIPT failed"
+    [ ! -z VERSION ] || die "empty VERSION in $SCRIPT"
+    [ ! -z SOURCES ] || die "empty SOURCES in $SCRIPT"
+    [ ! -z BUILD ] || die "empty BUILD in $SCRIPT"
+    PACKAGE=$(basename "$SCRIPT" .build)
+    TARBALL=$(basename "$PACKAGE")-$VERSION-$BUILD.txz
+    repodir=${REPODIR}
+    pkgdir=$CWD/$PACKAGE-build
+    srcdir=$CWD/$PACKAGE-source
+    tmpdir=$CWD/$PACKAGE-tmp
+}
+
+download_sources ()
+{
+    echo "+ Downloading sources ..."
+    for s in ${SOURCES[@]}
+    do
+	echo "++ Source $(basename $s) ..."
+	wget -nv -c $s -P $REPODIR
+    done
+}
+
+TEMP=$(getopt -o h -l help,force,clean,package,repodir:,batch: -n "$PROGRAM" -- "$@")
 [ $? -eq 0 ] || exit $?
 eval set -- $TEMP
 while :
@@ -111,44 +142,42 @@ do
 	--force) OPTION_FORCE="y"; shift 1;;
 	--clean) OPTION_CLEAN="y"; shift 1;;
 	--package) OPTION_PACKAGE="y"; shift 1;;
+	--repodir) REPODIR="$2"; shift 2;;
 	--) shift; break;;
 	*) usage 1;;
     esac
 done
 
-[ -z "$@" ] && usage 1
+[ $# -eq 0 ] && [ -z "${OPTION_BATCH}" ] && usage 1
+
+REPODIR=${REPODIR:-/usr/src}
 
 shopt -u sourcepath
 
 if [ ! -z "${OPTION_BATCH}" ]
 then
-    FILES=$(cat "$OPTION_BATCH")
+    FILES=$(grep -v '^#' "$OPTION_BATCH")
     [ $# -eq 0 ] || usage 1
 else
     FILES="$@"
 fi
 
-for arg in "$FILES"
+for arg in $FILES
 do
     if [ ! -e "$arg" ]
     then
 	warn "Skipping $arg: file not found"
     else
-	CWD=$(pwd)
-	SCRIPT=$(realpath "$arg")
-	PACKAGE=$(basename "$SCRIPT" .build)
-	TARBALL=$(basename "$PACKAGE")-$(date +%Y%m%d).txz
-	repodir=/usr/src
-	pkgdir=$CWD/$PACKAGE-build
-	srcdir=$CWD/$PACKAGE-source
-	tmpdir=$CWD/$PACKAGE-tmp
-	echo "+ Building package $PACKAGE"
-	echo "+ Target $TARBALL"
-	prebuild_checks
-	echo "+ Building ..."
-	build_package
-	echo "+ Cleaning ..."
-	clean_directories
-	echo "+ $TARBALL"
+	environment
+	if [ ! -e "$TARBALL" -o "${OPTION_FORCE:-n}" = "y" ]
+	then
+	    prebuild_checks
+	    download_sources
+	    build_package
+	    clean_directories
+	    echo "+ $TARBALL"
+	else
+	    echo "+ Skipping ${TARBALL}..."
+	fi
     fi
 done

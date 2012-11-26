@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://www.kernel.org/pub/linux/kernel/v3.x/linux-3.5.2.tar.xz)
+VERSION=3.5.2
+BUILD=1
+
 build ()
 {
     tar xf $repodir/linux-3.5.2.tar.xz

@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://www.openssl.org/source/openssl-1.0.1c.tar.gz http://www.linuxfromscratch.org/patches/blfs/svn/openssl-1.0.1c-fix_manpages-1.patch)
+VERSION=1.0.1c
+BUILD=1
+
 build ()
 {
     tar xf $repodir/openssl-1.0.1c.tar.gz

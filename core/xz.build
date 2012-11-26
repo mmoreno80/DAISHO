@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://tukaani.org/xz/xz-5.0.4.tar.xz)
+VERSION=5.0.4
+BUILD=1
+
 build ()
 {
     tar xf $repodir/xz-5.0.4.tar.xz

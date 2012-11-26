@@ -17,12 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(ftp://ftp.astron.com/pub/file/file-5.11.tar.gz)
+VERSION=5.11
+BUILD=1
+
 build ()
 {
     tar xf $repodir/file-5.11.tar.gz
     mv file-5.11 $srcdir
     cd $srcdir
-    ./configure --prefix=/usr
+    ./configure \
+	--prefix=/usr
     make
     make DESTDIR=$pkgdir install
 }

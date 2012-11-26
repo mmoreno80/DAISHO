@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.gnu.org/gnu/coreutils/coreutils-8.19.tar.xz http://www.linuxfromscratch.org/patches/lfs/7.2/coreutils-8.19-i18n-1.patch)
+VERSION=8.19
+BUILD=1
+
 build ()
 {
     tar xf $repodir/coreutils-8.19.tar.xz

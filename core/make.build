@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.gnu.org/gnu/make/make-3.82.tar.bz2 http://www.linuxfromscratch.org/patches/lfs/7.2/make-3.82-upstream_fixes-2.patch)
+VERSION=3.82
+BUILD=1
+
 build ()
 {
     tar xf $repodir/make-3.82.tar.bz2

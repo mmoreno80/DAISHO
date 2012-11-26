@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.gnu.org/gnu/binutils/binutils-2.22.tar.bz2 http://www.linuxfromscratch.org/patches/lfs/7.2/binutils-2.22-build_fix-1.patch)
+VERSION=2.22
+BUILD=1
+
 build ()
 {
     tar xf $repodir/binutils-2.22.tar.bz2

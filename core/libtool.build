@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.gnu.org/gnu/libtool/libtool-2.4.2.tar.gz)
+VERSION=2.4.2
+BUILD=1
+
 build ()
 {
     tar xf $repodir/libtool-2.4.2.tar.gz

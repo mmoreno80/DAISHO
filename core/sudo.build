@@ -17,10 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://www.sudo.ws/sudo/dist/sudo-1.8.6p3.tar.gz)
+VERSION=1.8.6p3
+BUILD=1
+
 build ()
 {
-    tar xf $repodir/sudo-1.8.5p3.tar.gz
-    mv sudo-1.8.5p3 $srcdir
+    tar xf $repodir/sudo-1.8.6p3.tar.gz
+    mv sudo-1.8.6p3 $srcdir
     cd $srcdir
     ./configure \
 	--prefix=/usr \

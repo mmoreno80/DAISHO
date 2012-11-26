@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.gnu.org/gnu/glibc/glibc-2.16.0.tar.xz http://www.linuxfromscratch.org/patches/lfs/7.2/glibc-2.16.0-res_query_fix-1.patch)
+VERSION=2.16.0
+BUILD=1
+
 build ()
 {
     tar xf $repodir/glibc-2.16.0.tar.xz
@@ -25,10 +29,10 @@ build ()
     sed -i 's#<rpc/types.h>#"rpc/types.h"#' sunrpc/rpc_clntout.c
     sed -i '/test-installation.pl/d' Makefile
     sed -i 's|@BASH@|/bin/bash|' elf/ldd.bash.in
-    patch -Np1 -i /usr/src/core/glibc-2.16.0-res_query_fix-1.patch
+    patch -Np1 -i $repodir/glibc-2.16.0-res_query_fix-1.patch
     cd $tmpdir
     CFLAGS=${CFLAGS/-fstack-proterctor/}
-    CFLAGS=${CFLAGS/-D_FORTIFY_SOURCE=2/}
+    CFLAGS=${CFLAGS/-D_FORTIFY_SOURCES=2/}
     $srcdir/configure \
     	--prefix=/usr \
     	--disable-profile \

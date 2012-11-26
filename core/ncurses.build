@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(ftp://ftp.gnu.org/gnu/ncurses/ncurses-5.9.tar.gz)
+VERSION=5.9
+BUILD=1
+
 build ()
 {
     tar xf $repodir/ncurses-5.9.tar.gz

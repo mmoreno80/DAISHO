@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.gnu.org/gnu/gettext/gettext-0.18.1.1.tar.gz)
+VERSION=0.18.1.1
+BUILD=1
+
 build ()
 {
     tar xf $repodir/gettext-0.18.1.1.tar.gz

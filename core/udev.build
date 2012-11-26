@@ -17,12 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://www.freedesktop.org/software/systemd/systemd-188.tar.xz http://anduin.linuxfromscratch.org/sources/other/udev-lfs-188-3.tar.bz2)
+VERSION=188
+BUILD=1
+
 build ()
 {
     tar xf $repodir/systemd-188.tar.xz
     mv systemd-188 $srcdir
     cd $srcdir
-    tar xf $repdir/udev-lfs-188-3.tar.bz2
+    tar xf $repodir/udev-lfs-188-3.tar.bz2
     make -f udev-lfs-188/Makefile.lfs
     make DESTDIR=$pkgdir -f udev-lfs-188/Makefile.lfs install
 }

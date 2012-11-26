@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://www.kernel.org/pub/linux/docs/man-pages/man-pages-3.42.tar.xz)
+VERSION=3.42
+BUILD=1
+
 build ()
 {
     tar xf $repodir/man-pages-3.42.tar.xz

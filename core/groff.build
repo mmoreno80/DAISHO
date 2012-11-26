@@ -17,11 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.gnu.org/gnu/groff/groff-1.21.tar.gz)
+VERSION=1.21
+BUILD=1
+
 build ()
 {
     tar xf $repodir/groff-1.21.tar.gz
-    mv groff-1.21 $repodir
-    cd $repodir
+    mv groff-1.21 $srcdir
+    cd $srcdir
     PAGE=A4 \
 	./configure \
 	--prefix=/usr

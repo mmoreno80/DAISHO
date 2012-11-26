@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://www.kernel.org/pub/linux/kernel/v2.6/longterm/v2.6.34/linux-2.6.34.13.tar.bz2)
+VERSION=2.6.34.13
+BUILD=1
+
 build ()
 {
     tar xf $repodir/linux-2.6.34.13.tar.bz2

@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-6.1p1.tar.gz)
+VERSION=6.1p1
+BUILD=1
+
 build ()
 {
     tar xf $repodir/openssh-6.1p1.tar.gz

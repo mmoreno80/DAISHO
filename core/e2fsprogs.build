@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://prdownloads.sourceforge.net/e2fsprogs/e2fsprogs-1.42.5.tar.gz)
+VERSION=1.42.5
+BUILD=1
+
 build ()
 {
     tar xf $repodir/e2fsprogs-1.42.5.tar.gz

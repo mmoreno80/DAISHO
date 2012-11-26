@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://pkgconfig.freedesktop.org/releases/pkg-config-0.27.tar.gz)
+VERSION=0.27
+BUILD=1
+
 build ()
 {
     tar xf $repodir/pkg-config-0.27.tar.gz

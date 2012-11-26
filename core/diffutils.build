@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.gnu.org/gnu/diffutils/diffutils-3.2.tar.gz)
+VERSION=3.2
+BUILD=1
+
 build ()
 {
     tar xf $repodir/diffutils-3.2.tar.gz

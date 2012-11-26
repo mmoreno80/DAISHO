@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.gnu.org/gnu/texinfo/texinfo-4.13a.tar.gz)
+VERSION=4.13
+BUILD=1
+
 build ()
 {
     tar xf $repodir/texinfo-4.13a.tar.gz

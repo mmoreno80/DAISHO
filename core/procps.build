@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://procps.sourceforge.net/procps-3.2.8.tar.gz http://www.linuxfromscratch.org/patches/lfs/7.2/procps-3.2.8-fix_HZ_errors-1.patch http://www.linuxfromscratch.org/patches/lfs/7.2/procps-3.2.8-watch_unicode-1.patch)
+VERSION=3.2.8
+BUILD=1
+
 build ()
 {
     tar xf $repodir/procps-3.2.8.tar.gz

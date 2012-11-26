@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://download.savannah.gnu.org/releases/man-db/man-db-2.6.2.tar.xz)
+VERSION=2.6.2
+BUILD=1
+
 build ()
 {
     tar xf $repodir/man-db-2.6.2.tar.xz

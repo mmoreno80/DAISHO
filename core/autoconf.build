@@ -17,12 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.xz)
+VERSION=2.69
+BUILD=1
+
 build ()
 {
     tar xf $repodir/autoconf-2.69.tar.xz
     mv autoconf-2.69 $srcdir
     cd $srcdir
-    ./configure --prefix=/usr
+    ./configure \
+	--prefix=/usr
     make
     make DESTDIR=$pkgdir install
 }

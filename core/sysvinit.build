@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+SOURCES=(http://download.savannah.gnu.org/releases/sysvinit/sysvinit-2.88dsf.tar.bz2)
+VERSION=2.88
+BUILD=1
+
 build ()
 {
       tar xf $repodir/sysvinit-2.88dsf.tar.bz2
