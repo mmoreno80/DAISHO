@@ -66,6 +66,7 @@ install_package ()
     tar -C "$ROOT" -xmv --no-overwrite-dir -f "$TARBALL" > "/tmp/$$" || die "cannot install package $TARBALL"
     mv "/tmp/$$" "$LIB/$PACKAGE.installed" || die "cannot save installation log for $PACKAGE"
     echo "done."
+    log "$PACKAGE"
 }
 
 TEMP=$(getopt -o hv -l help,root:,lib: -n "$PROGRAM" -- "$@")
@@ -102,8 +103,7 @@ do
 	warn "cannot find tarball $arg"
     else
 	TARBALL=$(realpath "$arg")
-	PACKAGE=$(basename "${TARBALL/-[0-9]*\.txz}")
+	PACKAGE=$(basename "${TARBALL/-*-*.txz}")
 	install_package
-	log "$PACKAGE"
     fi
 done
