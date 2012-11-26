@@ -26,7 +26,7 @@ build ()
     tar xf $repodir/nvi-1.79.tar.gz
     mv nvi-1.79 $srcdir
     cd $srcdir
-    patch -Np1 -i $repodir/nvi-1.79-makefile.patch
+    sed -i -e '142,143d' build/Makefile.in
     cd build
     ./configure \
     	--prefix=/usr \
